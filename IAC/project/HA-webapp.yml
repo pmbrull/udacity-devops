@@ -1,0 +1,86 @@
+Description: >
+  pmbrull
+  Udacity's IAC project - deploy a High-Availability web app.
+  This requires
+    - VPC
+    - 2 AZs, chosen in the subnets
+    - 2 public subnets
+    - 2 Private subnets
+    - 2 EC2 with 2 CPU, 4GB RAM, 10 GB disk, Ubuntu 18.
+    - S3 bucket
+    - IAM role to use S3
+    - Inbount port HTTP 80 open
+    - Load Balancer with * public on port 80. Outbound 80. Located into public subnet.
+    - Launch Configuration
+    - Auto scaling group
+    - Unrestricted outbound access
+    - Output export of public LB URL
+    - http in front of LB DNS name in the output
+
+
+Parameters:
+
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Type: String
+
+    VpcCIDR:
+      Description: Please enter the IP range (CIDR notation)
+      Type: String
+      Default: 10.0.0.0/16
+
+
+Resources:
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+        VpcId: !Ref VPC
+        AvailabilityZone: !Select [0, !GetAZ's '']
+        CirderBlock: !Ref PublicSubnet1CIDR
+        MapPublicIpOnLaunch: true
+        Tags: 
+          - Key: Name
+            Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+        VpcId: !Ref VPC
+        AvailabilityZone: !Select [1, !GetAZ's '']
+        CirderBlock: !Ref PublicSubnet2CIDR
+        MapPublicIpOnLaunch: true
+        Tags: 
+          - Key: Name
+            Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+        VpcId: !Ref VPC
+        AvailabilityZone: !Select [0, !GetAZ's '']
+        CirderBlock: !Ref PrivateSubnet1CIDR
+        MapPublicIpOnLaunch: false
+        Tags: 
+          - Key: Name
+            Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+        VpcId: !Ref VPC
+        AvailabilityZone: !Select [1, !GetAZ's '']
+        CirderBlock: !Ref PrivateSubnet2CIDR
+        MapPublicIpOnLaunch: false
+        Tags: 
+          - Key: Name
+            Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
