@@ -373,8 +373,8 @@ PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
         VpcId: !Ref VPC
-        AvailabilityZone: !Select [ 0, !GetAZ's '' ]
-        CirderBlock: !Ref PrivateSubnet1CIDR
+        AvailabilityZone: !Select [ 0, !GetAZs '' ]
+        CidrBlock: !Ref PrivateSubnet1CIDR
         MapPublicIpOnLaunch: false
         Tags: 
             -   Key: Name
@@ -384,8 +384,8 @@ PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
         VpcId: !Ref VPC
-        AvailabilityZone: !Select [ 1, !GetAZ's '' ]
-        CirderBlock: !Ref PrivateSubnet1CIDR
+        AvailabilityZone: !Select [ 1, !GetAZs '' ]
+        CidrBlock: !Ref PrivateSubnet1CIDR
         MapPublicIpOnLaunch: false
         Tags: 
             -   Key: Name
@@ -394,9 +394,9 @@ PrivateSubnet2:
 
 You can see the index being used from the returning AvailabilityZone's array. Notice that our subnets are not sharing AvailabilityZones. We are keeping them separated like we displayed in our diagrams from the previous lesson:
 
-PrivateSubnet1: AvailabilityZone: !Select [ 0, !GetAZ's '' ]
+PrivateSubnet1: AvailabilityZone: !Select [ 0, !GetAZs '' ]
 
-PrivateSubnet2: AvailabilityZone: !Select [ 1, !GetAZ's '' ]
+PrivateSubnet2: AvailabilityZone: !Select [ 1, !GetAZs '' ]
 
 This code:
 
