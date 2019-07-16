@@ -60,7 +60,35 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
+  
+  S3RootIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'ec2.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyName: 'root'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 's3:*'
+                Resource: '*'
 
+  S3RootInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: '/'
+      Roles:
+      - !Ref S3RootIAMRole
   
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -69,17 +97,16 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt-get update -y
-          apt-get install unzip awscli -y
+          apt-get install awscli -y
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          aws s3 cp s3://udacity-demo-1/udacity.zip .
-          unzip -o udacity.zip
+          aws s3 cp https://s3-pmbrull-udacity-iac-project.s3-us-west-2.amazonaws.com/index.html .
       ImageId: ami-07b4f3c02c7f83d59
-      IamInstanceProfile: !Ref InstanceRolesProfile
-      KeyName: testKey
+      IamInstanceProfile: !Ref S3RootInstanceProfile
+      KeyName: test-key
       SecurityGroups:
-      - Ref: WebServerSecGroup
+      - !Ref WebServerSecGroup
       InstanceType: t2.micro
       BlockDeviceMappings:
       - DeviceName: "/dev/sdk"
@@ -101,14 +128,12 @@ Resources:
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
 
-  WebAppGroup: 
+  WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties: 
       VPCZoneIdentifier:
-      - Fn::ImportValue:
-        !Sub "${EnvironmentName}-PRIV-NETS"
-      LaunchConfigurationName:
-        Ref: WebAppLaunchConfig
+      - Fn::ImportValue: !Sub "${EnvironmentName}-PRIV-NETS"
+      LaunchConfigurationName: !Ref WebAppLaunchConfig
       MinSize: '1'
       MaxSize: '1'
       TargetGroupARNs:
@@ -121,17 +146,15 @@ Resources:
       - Fn::ImportValue: !Sub "${EnvironmentName}-PUB1-SN"
       - Fn::ImportValue: !Sub "${EnvironmentName}-PUB2-SN"
       SecurityGroups:
-      - Ref: LBSecGroup
+      - !Ref LBSecGroup
   
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
       - Type: forward
-        TargetGroupArn:
-          Ref: WebbAppTargetGroup
-      LoadBalancerArn:
-        Ref: WebAppLB
+        TargetGroupArn: !Ref WebAppTargetGroup
+      LoadBalancerArn: !Ref WebAppLB
       Port: '80'
       Protocol: HTTP
     
@@ -147,4 +170,11 @@ Resources:
       ListenerArn: !Ref 'Listener'
       Priority: 1
 
-  
+Outputs:
+
+  LoadBalancer:
+    Description: DNS for the LB
+    Value: 
+      Fn::GetAtt: WebAppLB.DNSName
+    Export:
+      Name: !Sub "${EnvironmentName}-WEBAPP-LB"

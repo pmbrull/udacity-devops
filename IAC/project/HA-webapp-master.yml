@@ -1,17 +1,64 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Type: String
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation)
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: CidrBlock for the first Public Subnet
+    Type: String
+    Default: 10.0.1.0/24
+
+  PublicSubnet2CIDR:
+    Description: CidrBlock for the second Public Subnet
+    Type: String
+    Default: 10.0.1.0/24
+
+  PrivateSubnet1CIDR:
+    Description: CidrBlock for the first Private Subnet
+    Type: String
+    Default: 10.0.1.0/24
+
+  PrivateSubnet2CIDR:
+    Description: CidrBlock for the second Private Subnet
+    Type: String
+    Default: 10.0.1.0/24
+
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: https://pmbrull-cloudformation-yaml.s3-us-west-2.amazonaws.com/templates/HA-webapp-vpc.yml
       Parameters:
-        EnvironmentName: "Udacity-IAC-Project"
-        VpcCIDR: "10.0.0.0/16"
-        PublicSubnet1CIDR: "10.0.0.0/24"
-        PublicSubnet2CIDR: "10.0.1.0/24"
-        PrivateSubnet1CIDR: "10.0.2.0/24"
-        PrivateSubnet2CIDR: "10.0.3.0/24"
+        EnvironmentName: !Ref EnvironmentName
+        VpcCIDR: !Ref VpcCIDR
+        PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnet2CIDR
+        PrivateSubnet1CIDR: !Ref PrivateSubnet1CIDR
+        PrivateSubnet2CIDR: !Ref PrivateSubnet2CIDR
+  ASServerStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: VPCStack
+    Properties:
+      TemplateURL: https://pmbrull-cloudformation-yaml.s3-us-west-2.amazonaws.com/templates/HA-webapp-servers.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
 
 Outputs:
-  StackRef:
+
+  VPCStackRef:
     Value: !Ref VPCStack
+  
+  ServerStackRef:
+    Value: !Ref ASServerStack
+
+  LBDNS:
+    Value: 
+      Fn::GetAtt: ASServerStack.Outputs.LoadBalancer"
