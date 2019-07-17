@@ -274,8 +274,7 @@ Resources:
           cd /var/www/html
           aws s3 cp s3://s3-pmbrull-udacity-iac-project/index.html .
       ImageId: ami-07b4f3c02c7f83d59
-      IamInstanceProfile: !Ref S3ListInstanceProfile
-      KeyName: test-key
+      IamInstanceProfile: !Ref S3GetInstanceProfile
       SecurityGroups:
       - !Ref WebServerSecGroup
       InstanceType: t2.micro
@@ -348,7 +347,7 @@ Resources:
   # [!Servers]
   # [IAM]
 
-  S3ListIAMRole:
+  S3GetIAMRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -362,20 +361,20 @@ Resources:
               - 'sts:AssumeRole'
       Path: '/'
       Policies:
-        - PolicyName: S3ListPolicy
+        - PolicyName: S3GetPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: 'Allow'
-                Action: 's3:List*'
+                Action: 's3:Get*'
                 Resource: '*'
 
-  S3ListInstanceProfile:
+  S3GetInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
       Path: '/'
       Roles:
-        - Ref: 'S3ListIAMRole'
+        - Ref: 'S3GetIAMRole'
   
   # [!IAM]
   # [Bastion]
