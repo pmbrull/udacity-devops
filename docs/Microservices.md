@@ -153,3 +153,34 @@ Then, you'll need to set up a Cloud9 environment that is connected to the main G
 
 [Here](https://github.com/noahgift/awslambda/blob/master/beginners_guide_aws_lambda.ipynb) there is a guide on how to configure Cloud9 environment and write AWS Lambda functions in Python.
 
+You can create many different environments. Moreover, this environment is linked to your AWS environment. So, for example, you can run `aws s3 ls` and get your list of buckets from the cloud9 terminal. Moreover, you can invite anyone to this environment and pair programming!
+
+However, one of the best things of cloud9 is that from there you can code lambda functions (AWS Resources tab).
+
+If there are some syntax errors when coding Python 3 functions on the prints, you need to tell the editor that it's indeed Python 3 and not 2. You can do that in project settings > Python Support.
+
+> A basic lambda_handler function accepts as input (event, context)
+
+Also, from the AWS Resource tab, you can click on your lambda functions and deploy them to AWS cloud. Then, in the console, you can look for your new lambda function. What it is interesting is that by accessing your lambda function through the Lambda service, you can still modify, test it and access to AWS CloudWatch.
+
+## Event-Handling
+
+When returning a response from a lambda function, it is important that it is a JSON with `"statusCode": 200`, to let know the application that made the request that everything went OK. Also, `"headers": { "Content-type": "application/json" }` tells the person receiving the code that this is a JSON payload. Finally, the actuall return values should be inside a `body`.
+
+Note that we cannot just test the lambda functions as usual Python functions with `Lambda (local)` Run option, but we can also test it as if it was a web service. However, this means that we need to create the function accepting this API Gateway with a Resource Path and some Security. Then, we can test using a POST method on the path defined before.
+
+After testing the API Gateway response, our code is ready to deploy it a microservice in AWS. (Tests done with udacityChange examples).
+
+Note that if we deploy a lambda function with enabled API Gateway, this will appear as a trigger for the function in AWS console. If we click on it, it will give us an API endpoint that we can also use for testing in cloud9 environment. To do so, activate the virtual environment created for the function with `sourve venv/bin/activate` and `pip install ipython`, as we are going to use the ipython shell. Run `ipython` to enter this shell and you can also install packages there, such as `pip install requests`. We will use this package to request for the API Gateway. 
+
+```python
+url = 'https://tdpaaxpk27.execute-api.us-west-2.amazonaws.com/Prod/change'                            
+
+result = requests.post(url, json={"amount": "1.89"})                                                  
+
+result                                                                                                
+# <Response [200]>
+
+result.json()                                                                                        
+# {'res': [{'7': 'quarters'}, {'1': 'dimes'}, {'4': 'pennies'}]}
+```
