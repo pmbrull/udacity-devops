@@ -276,6 +276,11 @@ Note that after cmd1 and cmd2, and before @echo, should be a tab. The @ at the s
 
 ### Linting and CircleCI
 
+To install hadolint:
+```bash
+sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 && sudo chmod +x /bin/hadolint
+```
+
 Here are the steps Noah took in the above video:
 
     Added to the Makefile:
