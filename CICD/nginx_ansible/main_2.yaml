@@ -1,0 +1,10 @@
+# Install Nginx
+- hosts: localhost
+  connection: local
+  become: True
+  become_user: root
+  gather_facts: True
+  tasks:
+    - name: debug
+      debug:
+        msg: "{{ ansible_facts['ansible_os_family'] }}"
