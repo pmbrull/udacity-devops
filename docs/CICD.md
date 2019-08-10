@@ -497,3 +497,91 @@ roles/nginx/tasks/main.yaml:
     enabled: yes
     state: started
 ```
+
+## Monitoring
+
+Here’s what you’ll learn in this lesson on monitoring:
+
+    Monitoring software
+    Push vs pull monitoring
+    Prometheus quick setup
+    Adding a server to Prometheus
+    Adding an attribute to Prometheus
+    Prometheus dashboards
+    Log monitoring with ELK stack
+    Alerts
+
+### Pull vs. Push:
+
+* Pull: Monitoring Agent sends info to the Monitoring Server
+* Push: Monitoring Server sends info to the Agent
+
+### Prometheus
+
+Prometheus is a very useful, flexible tool for our monitoring.
+
+#### Prometheus Quickstart
+
+https://github.com/cloudalchemy/ansible-prometheus
+
+    Install Ansible
+    Git clone Ansible-prometheus
+    Install pip and tox
+    Setup role
+    Create inventory file
+    Create main.yaml playbook
+    Run playbook
+    Install node exporter and configure
+    Check web interface
+
+Installed under *vudacity* venv.
+
+Follow node exporter steps here:
+https://www.digitalocean.com/community/tutorials/how-to-install-prometheus-on-ubuntu-16-04
+
+#### Install and Configure Grafana for Prometheus
+
+```
+curl -LO https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_5.1.4_amd64.deb ;
+sudo apt-get install -y adduser libfontconfig ;
+sudo dpkg -i grafana_5.1.4_amd64.deb ;
+sudo systemctl start grafana-server ;
+sudo systemctl enable grafana-server
+```
+
+### ELK
+
+    Elasticsearch: Log aggregator
+    Logstash: Agent to send logs into Elasticsearch
+    Kibana: GUI web interface to search logs
+
+#### ELK Stack Quickstart
+
+    Clone this Github repo: https://github.com/elastic/ansible-elasticsearch
+    Create inventory file
+    Create main.yaml playbook
+    Run the playbook
+    Configure Elasticsearch password for user “elastic” (default):
+        /usr/share/elasticsearch/bin/elasticsearch-keystore add "bootstrap.password"
+
+
+#### Configure Logstash
+
+Sending logs to Elasticsearch
+
+    Login to Kibana
+    Install Logstash
+    Configure connection string to Elasticsearch
+    Check Kibana for logs
+
+#### Pro Tips on Using the ELK Stack
+
+The ELK stack requires more memory than everything else in this course.
+
+    The standard config recommends 2GB. This is why we migrate to a larger instance.
+    It may also be necessary to stop anything else that you have set up in this course (i.e. Jenkins, Prometheus, and Grafana).
+    If the Ansible installation script for Elasticsearch takes too long (more than 5 minutes for a single item) you may have run out of memory.
+    Do not be alarmed, just restart the EC2 instance either through the command line, or if necessary in the AWS web console.
+
+
+
